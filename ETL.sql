@@ -3,22 +3,22 @@ USE Treinamento_TSQL
 -- SELECT comum
 SELECT * FROM TB_CHURN
 ------------------------------------------------------------------------------------------------------------------------------------------------
--- verificando n�mero total de clientes
+-- VERIFICANDO NÚMERO TOTAL DE CLIENTES
 ------------------------------------------------------------------------------------------------------------------------------------------------
 SELECT COUNT(*) AS NumeroTotalClientes
 FROM TB_CHURN
 
 ------------------------------------------------------------------------------------------------------------------------------------------------
--- checando clientes duplicados
--- R: Nenhum cliente duplicado
+-- CHECANDO CLIENTES DUPLICADOS
+-- R: NENHUM CLIENTE DUPLICADO
 ------------------------------------------------------------------------------------------------------------------------------------------------
 SELECT CustomerID, COUNT(CustomerID) AS TotalClientes 
 FROM TB_CHURN
 GROUP BY CustomerID
 HAVING COUNT(CustomerID) >1
 ------------------------------------------------------------------------------------------------------------------------------------------------
--- verifica��o de valores nulos/vazios
--- Tenure, WarehouseToHome, HourSpendOnApp, OrderAmountHikeFromlastYear, CouponUsed, OrderCount, DaySinceLastOrder possuem valores nulos/vazios 
+-- VERIFICACAO DE VALORES NULOS/VAZIOS
+-- TENURE, WAREHOUSETOHOME, HOURSPENDONAPP, ORDERAMOUNTHIKEFROMLASTYEAR, COUPONUSED, ORDERCOUNT, DAYSINCELASTORDER POSSUEM VALORES NULOS/VAZIOS
 ------------------------------------------------------------------------------------------------------------------------------------------------
 SELECT 'Tenure' AS ColumnName, COUNT(*) QuantityNull
 FROM [dbo].[TB_CHURN]
@@ -49,7 +49,7 @@ FROM [dbo].[TB_CHURN]
 WHERE DaySinceLastOrder = ''
 
 ------------------------------------------------------------------------------------------------------------------------------------------------
--- substitui��o dos valores em branco/null pela m�dia dos dados
+-- SUBSTITUICAO DOS VALORES EM BRANCO/NULL PELA MEDIA DOS DADOS
 ------------------------------------------------------------------------------------------------------------------------------------------------
 ALTER TABLE TB_CHURN ALTER COLUMN HourSpendOnApp SMALLINT
 
@@ -175,5 +175,3 @@ UPDATE TB_CHURN
 SET warehousetohome= '27'
 WHERE warehousetohome = '127'
 
-
-SELECT * FROM TB_CHURN
