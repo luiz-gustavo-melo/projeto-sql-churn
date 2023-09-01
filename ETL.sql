@@ -3,7 +3,7 @@ USE Treinamento_TSQL
 -- SELECT comum
 SELECT * FROM TB_CHURN
 ------------------------------------------------------------------------------------------------------------------------------------------------
--- verificando número total de clientes
+-- verificando nï¿½mero total de clientes
 ------------------------------------------------------------------------------------------------------------------------------------------------
 SELECT COUNT(*) AS NumeroTotalClientes
 FROM TB_CHURN
@@ -17,7 +17,7 @@ FROM TB_CHURN
 GROUP BY CustomerID
 HAVING COUNT(CustomerID) >1
 ------------------------------------------------------------------------------------------------------------------------------------------------
--- verificação de valores nulos/vazios
+-- verificaï¿½ï¿½o de valores nulos/vazios
 -- Tenure, WarehouseToHome, HourSpendOnApp, OrderAmountHikeFromlastYear, CouponUsed, OrderCount, DaySinceLastOrder possuem valores nulos/vazios 
 ------------------------------------------------------------------------------------------------------------------------------------------------
 SELECT 'Tenure' AS ColumnName, COUNT(*) QuantityNull
@@ -49,7 +49,7 @@ FROM [dbo].[TB_CHURN]
 WHERE DaySinceLastOrder = ''
 
 ------------------------------------------------------------------------------------------------------------------------------------------------
--- substituição dos valores em branco/null pela média dos dados
+-- substituiï¿½ï¿½o dos valores em branco/null pela mï¿½dia dos dados
 ------------------------------------------------------------------------------------------------------------------------------------------------
 ALTER TABLE TB_CHURN ALTER COLUMN HourSpendOnApp SMALLINT
 
@@ -176,5 +176,4 @@ SET warehousetohome= '27'
 WHERE warehousetohome = '127'
 
 
-
-
+SELECT * FROM TB_CHURN
