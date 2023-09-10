@@ -46,7 +46,7 @@ GROUP BY CityTier
 ORDER BY ChurnRate;
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------
--- CRIANDO COLUNA PARA DESCREVER A DISTANCIA DA CASA DOS CLIENTES VS ARMAZEM
+-- DISTANCIA DA CASA DOS CLIENTES VS ARMAZEM
 -------------------------------------------------------------------------------------------------------------------------------------------------------------
 ALTER TABLE tb_churn
 ADD WareHouseToHomeRange VARCHAR(100);
@@ -70,3 +70,25 @@ FROM tb_churn
 GROUP BY 
 	WareHouseToHomeRange
 ORDER BY Churn DESC;
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- MODALIDADE DE PAGAMENTO ENTRE OS CLIENTES
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Modificando a abreviação para nome completo
+UPDATE tb_churn
+SET PreferredPaymentMode = 'Cash On Delivery'
+WHERE PreferredPaymentMode = 'COD'
+
+
+-- qtd de clientes e % churn
+SELECT 
+	 PreferredPaymentMode, COUNT(PreferredPaymentMode) AS qtd_Customers,
+	 SUM(Churn) AS churn,
+	 CAST(SUM(Churn)  * 100.0  / COUNT(*)  AS decimal(5,2))AS '%Churn'
+FROM tb_churn
+GROUP BY 
+	PreferredPaymentMode
+ORDER BY 
+	churn DESC
