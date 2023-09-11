@@ -4,14 +4,14 @@ USE Treinamento_TSQL
 -- TAXA DE CHURN
 -------------------------------------------------------------------------------------------------------------------------------------------------------------
 SELECT 
-	TotalNumberofCustomers,
-	TotalNumberOfChurnedCustomers,
-	CAST((TotalNumberOfChurnedCustomers * 1.0/TotalNumberofCustomers * 1.0) * 100 AS decimal(10,2)) AS ChurnRate
+	TotalCustomers,
+	CustomersChurn,
+	CAST((CustomersChurn * 1.0/TotalCustomers * 1.0) * 100 AS decimal(10,2)) AS ChurnRate
 FROM
-	(SELECT COUNT(*) AS TotalNumberofCustomers
+	(SELECT COUNT(*) AS TotalCustomers
 	 FROM tb_churn ) AS Total,
 
-	(SELECT COUNT(*) TotalNumberOfChurnedCustomers
+	(SELECT COUNT(*) CustomersChurn
 	 FROM tb_churn
 	 WHERE CustomerStatus = 'Churn') AS Churned;
 
@@ -21,7 +21,7 @@ FROM
 SELECT 
 	PreferredLoginDevice,
 	COUNT(*) AS TotalCustomers,
-	SUM(Churn) AS TotalChurn,
+	SUM(Churn) AS CustomersChurn,
 	CAST(SUM(Churn) * 1.0/COUNT(*) * 100 AS Decimal (10,2)) AS ChurnRate
 FROM tb_churn
 GROUP BY 
@@ -39,7 +39,7 @@ ALTER TABLE tb_churn ALTER COLUMN Churn INT;
 SELECT 
 	CityTier,
 	COUNT(*) AS TotalCustomers,
-	SUM(Churn) AS TotalChurn,
+	SUM(Churn) AS CustomersChurn,
 	CAST(SUM(Churn) * 1.0/COUNT(*) * 100 AS Decimal (10,2)) AS ChurnRate
 FROM tb_churn
 GROUP BY CityTier
@@ -64,12 +64,12 @@ SET WareHouseToHomeRange =
 SELECT 
 	WareHouseToHomeRange,
 	COUNT(*) AS TotalCustomers,
-	SUM(Churn) AS Churn,
+	SUM(Churn) AS CustomersChurn,
 	CAST(SUM(Churn)  * 100.0  / COUNT(*)  AS decimal(5,2))AS '%Churn'
 FROM tb_churn
 GROUP BY 
 	WareHouseToHomeRange
-ORDER BY Churn DESC;
+ORDER BY CustomersChurn DESC;
 
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -82,13 +82,55 @@ SET PreferredPaymentMode = 'Cash On Delivery'
 WHERE PreferredPaymentMode = 'COD'
 
 
--- qtd de clientes e % churn
+-- qtd de clientes e %churn pela forma de pagamento
 SELECT 
-	 PreferredPaymentMode, COUNT(PreferredPaymentMode) AS qtd_Customers,
-	 SUM(Churn) AS churn,
+	 PreferredPaymentMode, 
+	 COUNT(1) AS TotalCustomers,
+	 SUM(Churn) AS CustomersChurn,
 	 CAST(SUM(Churn)  * 100.0  / COUNT(*)  AS decimal(5,2))AS '%Churn'
 FROM tb_churn
 GROUP BY 
 	PreferredPaymentMode
 ORDER BY 
-	churn DESC
+	CustomersChurn DESC;
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- TEMPO DE PERMANÊNCIA P/ FAIXA DE TEMPO
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Criar status, com tempo de permanência 
+ALTER TABLE tb_churn ADD TenureRange VARCHAR(100);
+
+UPDATE tb_churn 
+SET TenureRange = 
+	CASE 
+		WHEN tenure <= 6 THEN  '6 meses'
+		WHEN tenure > 6 AND tenure <= 12 THEN  '1 ano'
+		WHEN tenure > 12 AND tenure <= 24 THEN  '2 anos'
+		WHEN tenure > 24  THEN  'Maior que 2 anos'
+	END;
+
+
+-- qtd de clientes e %churn, por tempo de permanência
+SELECT 
+	TenureRange,
+	COUNT(*) AS TotalCustomers,
+	SUM(Churn) AS CustomersChurn,
+	CAST(SUM(CHURN) * 100.0 / COUNT(*) AS DECIMAL(5,2)) AS '%Churn'
+FROM tb_churn
+GROUP BY TenureRange
+ORDER BY '%Churn' DESC;
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- TAXA DE CANCELAMENTO POR GÊNERO
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+SELECT 
+	Gender,
+	COUNT(1) AS TotalCustomers,
+	SUM(Churn) AS CustomersChurn,
+	CAST(SUM(Churn) * 100.0 / COUNT(1) AS decimal(5,2)) AS '%Churn'
+FROM tb_churn
+GROUP BY Gender
+ORDER BY CustomersChurn DESC
+
