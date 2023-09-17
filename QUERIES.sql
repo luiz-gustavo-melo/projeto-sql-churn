@@ -1,4 +1,5 @@
 USE Treinamento_TSQL
+GO
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- TAXA DE CHURN
@@ -28,7 +29,7 @@ GROUP BY
 	PreferredLoginDevice;
 
 -- Stored Procedure para verificar detalhes sobre a tb_churn
-SP_HELP tb_churn
+SP_HELP tb_churn;
 
 -- Alterando o tipo de dado da coluna Churn para INT
 ALTER TABLE tb_churn ALTER COLUMN Churn INT;
@@ -51,14 +52,19 @@ ORDER BY ChurnRate;
 ALTER TABLE tb_churn
 ADD WareHouseToHomeRange VARCHAR(100);
 
-UPDATE tb_churn
-SET WareHouseToHomeRange = 
-	CASE 
-		WHEN warehouseToHome <= 10 THEN 'Very close distance'
-		WHEN warehouseToHome > 10 AND warehouseToHome <= 20 THEN 'Close distance'
-		WHEN warehouseToHome > 20 AND warehouseToHome <= 30 THEN 'Moderate distance'
-		WHEN warehouseToHome > 30 THEN 'Far distance'
-	END ;
+BEGIN TRAN
+
+	UPDATE tb_churn
+	SET WareHouseToHomeRange = 
+		CASE 
+			WHEN warehouseToHome <= 10 THEN 'Very close distance'
+			WHEN warehouseToHome > 10 AND warehouseToHome <= 20 THEN 'Close distance'
+			WHEN warehouseToHome > 20 AND warehouseToHome <= 30 THEN 'Moderate distance'
+			WHEN warehouseToHome > 30 THEN 'Far distance'
+		END ;
+SELECT @@ROWCOUNT
+
+COMMIT 
 
 -- Identificando qual maior churn por distancia
 SELECT 
@@ -77,9 +83,14 @@ ORDER BY CustomersChurn DESC;
 -------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 -- Modificando a abreviação para nome completo
-UPDATE tb_churn
-SET PreferredPaymentMode = 'Cash On Delivery'
-WHERE PreferredPaymentMode = 'COD'
+BEGIN TRAN
+
+	UPDATE tb_churn
+	SET PreferredPaymentMode = 'Cash On Delivery'
+	WHERE PreferredPaymentMode = 'COD';
+SELECT @@ROWCOUNT
+
+COMMIT 
 
 
 -- qtd de clientes e %churn pela forma de pagamento
@@ -125,12 +136,11 @@ ORDER BY '%Churn' DESC;
 -------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- TAXA DE CANCELAMENTO POR GÊNERO
 -------------------------------------------------------------------------------------------------------------------------------------------------------------
-SELECT 
+SELECT
 	Gender,
 	COUNT(1) AS TotalCustomers,
 	SUM(Churn) AS CustomersChurn,
 	CAST(SUM(Churn) * 100.0 / COUNT(1) AS decimal(5,2)) AS '%Churn'
 FROM tb_churn
 GROUP BY Gender
-ORDER BY CustomersChurn DESC
-
+ORDER BY CustomersChurn
